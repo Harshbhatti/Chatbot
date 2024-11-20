@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e2f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #282c34;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #23252b;
+            color: #0ef;
+            padding: 15px;
+            text-align: center;
+            font-size: 2.1em;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .chatbox {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #1e1e2f;
+            border-bottom: 1px solid #444;
+        }
+
+        .message {
+            display: inline-block;
+            padding: 12px 18px;
+            border-radius: 15px;
+            margin: 10px 0;
+            max-width: 80%;
+            word-wrap: break-word;
+            font-size: 0.95em;
+        }
+
+        .user {
+            background-color: #0078d7;
+            color: #fff;
+            text-align: right;
+            align-self: flex-end;
+            margin-left: auto;
+            box-shadow: 0 0 10px #0078d7;
+        }
+
+        .bot {
+            background-color: #333;
+            color: #0ef;
+            text-align: left;
+            align-self: flex-start;
+            box-shadow: 0 0 10px #0ef;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 10px;
+            background-color: #23252b;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            font-size: 1em;
+            background-color: #2c2f36;
+            color: #0ef;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 18px;
+            background-color: #0ef;
+            color: #1e1e2f;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #07d1c4;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0 0 10px 0;
+        }
+
+        ul li {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #0ef;
+            color: #1e1e2f;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        ul li:hover {
+            background-color: #07d1c4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Welcome to our Chatbot Assistant!
+        </div>
+        <div class="chatbox" id="chatbox">
+            <p>Interact with our chatbot by selecting an option or typing a command:</p>
+            <ul>
+                <li onclick="handleOptionClick('1')">1: Services</li>
+                <li onclick="handleOptionClick('2')">2: Web Design</li>
+                <li onclick="handleOptionClick('3')">3: Digital Marketing</li>
+                <li onclick="handleOptionClick('4')">4: Google Workspace</li>
+                <li onclick="handleOptionClick('5')">5: Cloud Hosting</li>
+                <li onclick="handleOptionClick('6')">6: Cybersecurity</li>
+                <li onclick="handleOptionClick('7')">7: E-commerce Solutions</li>
+                <li onclick="handleOptionClick('8')">8: Mobile Apps</li>
+                <li onclick="handleOptionClick('9')">9: SEO Services</li>
+                <li onclick="handleOptionClick('10')">10: Content Marketing</li>
+                <li onclick="handleOptionClick('11')">11: Contact</li>
+            </ul>
+        </div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Type your message here..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <script>
+        // Add message to the chatbox
+        function addMessageToChatbox(message, sender) {
+            const urlRegex = /https?:\/\/[^\s]+/g;
+            message = message.replace(urlRegex, function(url) {
+                return `<a href="${url}" target="_blank">${url}</a>`;
+            });
+
+            let messageDiv = document.createElement("div");
+            messageDiv.classList.add("message");
+            messageDiv.classList.add(sender);
+            messageDiv.innerHTML = message;
+            document.getElementById("chatbox").appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Send message from user input
+        function sendMessage() {
+            let userMessage = document.getElementById("userInput").value;
+            if (userMessage.trim() !== "") {
+                addMessageToChatbox(userMessage, "user");
+                document.getElementById("userInput").value = "";
+                fetch(`/chat?message=${encodeURIComponent(userMessage)}`)
+                    .then(response => response.json())
+                    .then(data => addMessageToChatbox(data.response, "bot"))
+                    .catch(error => addMessageToChatbox("Sorry, there was an error. Please try again.", "bot"));
+            }
+        }
+
+        // Handle option click from list
+        function handleOptionClick(option) {
+            const optionMap = {
+                "1": "Services",
+                "2": "Web Design",
+                "3": "Digital Marketing",
+                "4": "Google Workspace",
+                "5": "Cloud Hosting",
+                "6": "Cybersecurity",
+                "7": "E-commerce Solutions",
+                "8": "Mobile Apps",
+                "9": "SEO Services",
+                "10": "Content Marketing",
+                "11": "Contact"
+            };
+
+            let userMessage = optionMap[option] ? `Option ${option}: ${optionMap[option]}` : `Option ${option}`;
+            addMessageToChatbox(userMessage, "user");
+
+            fetch(`/chat?message=${option}`)
+                .then(response => response.json())
+                .then(data => addMessageToChatbox(data.response, "bot"))
+                .catch(error => addMessageToChatbox("Sorry, there was an error. Please try again.", "bot"));
+        }
+
+        // Scroll chat to the bottom
+        function scrollToBottom() {
+            const chatbox = document.getElementById("chatbox");
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        // Listen for Enter key to trigger sendMessage
+        document.getElementById("userInput").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();  // Prevent form submission or other default behavior
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
